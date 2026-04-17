@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyNkMZcuMoZtnLGPA34caCyU",
+      "authorship_tag": "ABX9TyP0EdEclZYYAYRlP35ouxUb",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -56,7 +56,7 @@
       "metadata": {
         "colab": {
           "base_uri": "https://localhost:8080/",
-          "height": 458
+          "height": 423
         },
         "id": "jSoJr7PZAoMn",
         "outputId": "2d457d8e-d384-4256-d13c-e2248a04be96"
@@ -848,7 +848,7 @@
       "metadata": {
         "colab": {
           "base_uri": "https://localhost:8080/",
-          "height": 448
+          "height": 607
         },
         "id": "06bf4544",
         "outputId": "b5b20b25-44c8-46c3-e33f-df3d395c9593"
@@ -905,7 +905,7 @@
       "metadata": {
         "colab": {
           "base_uri": "https://localhost:8080/",
-          "height": 448
+          "height": 607
         },
         "id": "339d7270",
         "outputId": "e256a8e5-d464-4420-b71f-df4bcdd3961e"
@@ -1286,6 +1286,18 @@
           ]
         }
       ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from google.colab import drive\n",
+        "drive.mount('/content/drive')"
+      ],
+      "metadata": {
+        "id": "4kkJEFeXO0BU"
+      },
+      "execution_count": null,
+      "outputs": []
     },
     {
       "cell_type": "markdown",
