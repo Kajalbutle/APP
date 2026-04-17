@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyP0EdEclZYYAYRlP35ouxUb",
+      "authorship_tag": "ABX9TyMLaq8FvAAvjfCwdto5PZcl",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -848,7 +848,7 @@
       "metadata": {
         "colab": {
           "base_uri": "https://localhost:8080/",
-          "height": 607
+          "height": 491
         },
         "id": "06bf4544",
         "outputId": "b5b20b25-44c8-46c3-e33f-df3d395c9593"
@@ -905,7 +905,7 @@
       "metadata": {
         "colab": {
           "base_uri": "https://localhost:8080/",
-          "height": 607
+          "height": 491
         },
         "id": "339d7270",
         "outputId": "e256a8e5-d464-4420-b71f-df4bcdd3961e"
@@ -1037,7 +1037,7 @@
       "metadata": {
         "colab": {
           "base_uri": "https://localhost:8080/",
-          "height": 253
+          "height": 245
         },
         "id": "06b8b630",
         "outputId": "745a70ca-9ba0-437c-853d-37e8e29f4e6d"
@@ -1286,6 +1286,154 @@
           ]
         }
       ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "31e4ca9d"
+      },
+      "source": [
+        "## Deploying as a Streamlit App\n",
+        "\n",
+        "To deploy this project as a Streamlit application, you'll need two main files:\n",
+        "\n",
+        "1.  **`streamlit_app.py`**: This Python file will contain the Streamlit application code, including loading the model, taking user input, and displaying predictions.\n",
+        "2.  **`requirements.txt`**: This file lists all the Python libraries your Streamlit app depends on.\n",
+        "\n",
+        "After creating these files, you can upload them (along with your `random_forest_model.pkl` file) to a platform like GitHub and then connect your repository to Streamlit.io for deployment.\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "8f9c5378",
+        "outputId": "76b256ad-7c52-4b76-d221-159168a1129f"
+      },
+      "source": [
+        "%%writefile streamlit_app.py\n",
+        "\n",
+        "import streamlit as st\n",
+        "import pandas as pd\n",
+        "import pickle\n",
+        "\n",
+        "st.set_page_config(page_title=\"Salary Predictor App\", page_icon=\"💰\")\n",
+        "\n",
+        "st.title(\"💰 Salary Predictor App\")\n",
+        "st.write(\"Enter the details below to predict the salary using our Random Forest Regressor model.\")\n",
+        "\n",
+        "# Load the trained model\n",
+        "try:\n",
+        "    with open('random_forest_model.pkl', 'rb') as file:\n",
+        "        loaded_model = pickle.load(file)\n",
+        "    st.success(\"Model loaded successfully!\")\n",
+        "except FileNotFoundError:\n",
+        "    st.error(\"Error: 'random_forest_model.pkl' not found. Please ensure the model file is in the same directory as the app.\")\n",
+        "    st.stop()\n",
+        "except Exception as e:\n",
+        "    st.error(f\"Error loading model: {e}\")\n",
+        "    st.stop()\n",
+        "\n",
+        "# Input fields for user data\n",
+        "st.header(\"User Input Features\")\n",
+        "\n",
+        "# Helper for categorical input guidance\n",
+        "def get_encoded_value_guidance(feature_name, mapping):\n",
+        "    st.markdown(f\"**{feature_name} Encoding:**\")\n",
+        "    for key, value in mapping.items():\n",
+        "        st.write(f\"- `{key}`: `{value}`\")\n",
+        "\n",
+        "# Age\n",
+        "user_age = st.slider(\"Age\", min_value=18, max_value=65, value=30)\n",
+        "\n",
+        "# Gender (assuming 0 for Female, 1 for Male based on original encoding)\n",
+        "st.subheader(\"Gender\")\n",
+        "user_gender_options = {'Female': 0, 'Male': 1}\n",
+        "user_gender_input = st.selectbox(\"Select Gender\", list(user_gender_options.keys()))\n",
+        "user_gender = user_gender_options[user_gender_input]\n",
+        "\n",
+        "# Education Level (assuming 0 for Bachelor's, 1 for Master's, 2 for PhD)\n",
+        "st.subheader(\"Education Level\")\n",
+        "user_education_options = {\"Bachelor's\": 0, \"Master's\": 1, \"PhD\": 2}\n",
+        "user_education_input = st.selectbox(\"Select Education Level\", list(user_education_options.keys()))\n",
+        "user_education = user_education_options[user_education_input]\n",
+        "\n",
+        "# Job Title - This is the trickiest without saving the original LabelEncoder\n",
+        "st.subheader(\"Job Title (Encoded Numerical Value)\")\n",
+        "st.write(\"Please refer to your training data to find the correct numerical encoding for the job title.\")\n",
+        "user_job_title = st.number_input(\"Enter Job Title Encoded Value\", min_value=0, max_value=300, value=159) # Max value is arbitrary, adjust as needed\n",
+        "\n",
+        "# Years of Experience\n",
+        "user_years_experience = st.slider(\"Years of Experience\", min_value=0.0, max_value=40.0, value=5.0, step=0.5)\n",
+        "\n",
+        "# Create a DataFrame from user input\n",
+        "user_input_df = pd.DataFrame({\n",
+        "    'Age': [user_age],\n",
+        "    'Gender': [user_gender],\n",
+        "    'Education Level': [user_education],\n",
+        "    'Job Title': [user_job_title],\n",
+        "    'Years of Experience': [user_years_experience]\n",
+        "})\n",
+        "\n",
+        "st.subheader(\"Input Data Preview\")\n",
+        "st.write(user_input_df)\n",
+        "\n",
+        "# Make prediction\n",
+        "if st.button(\"Predict Salary\"):\n",
+        "    try:\n",
+        "        predicted_salary = loaded_model.predict(user_input_df)[0]\n",
+        "        st.success(f\"### Predicted Salary: ${predicted_salary:,.2f}\")\n",
+        "    except Exception as e:\n",
+        "        st.error(f\"An error occurred during prediction: {e}\")\n"
+      ],
+      "execution_count": 36,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Writing streamlit_app.py\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "0dd8cb15",
+        "outputId": "55f0dfd2-e2b5-4192-cdf6-f2137a874999"
+      },
+      "source": [
+        "%%writefile requirements.txt\n",
+        "\n",
+        "streamlit\n",
+        "pandas\n",
+        "scikit-learn\n"
+      ],
+      "execution_count": 37,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Writing requirements.txt\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "LiieONenQ48O"
+      },
+      "execution_count": null,
+      "outputs": []
     },
     {
       "cell_type": "code",
